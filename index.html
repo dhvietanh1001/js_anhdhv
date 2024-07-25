@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .inputs, .buttons {
+            margin-bottom: 20px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            width: 100%;
+            max-width: 500px;
+            text-align: left;
+        }
+        .buttons{
+            display: flex;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="inputs">
+            <label>product id:</label>
+            <input type="number" id="productId" placeholder="Product ID" style="margin-right: 10px;">
+            <label>category id:</label>
+            <input type="number" id="categoryId" placeholder="Category ID">
+        </div>
+        <div class="buttons">
+            <button onclick="PrintfAll()">Print All</button>
+            <button onclick="filterProductByIdES6()">Filter by ID (ES6)</button>
+            <button onclick="filterProductByIdFor()">Filter by ID (For)</button>
+            <button onclick="filterProductByQualityES6()">Filter by Quality (ES6)</button>
+            <button onclick="filterProductByQualityFor()">Filter by Quality (For)</button>
+            <button onclick="filterProductBySaleDateES6()">Filter by Sale Date (ES6)</button>
+            <button onclick="filterProductBySaleDateFor()">Filter by Sale Date (For)</button>
+            <button onclick="totalProductES6()">Total Product (ES6)</button>
+            <button onclick="totalProductFor()">Total Product (For)</button>
+            <button onclick="isHaveProductInCategoryES6()">Product in Category (ES6)</button>
+            <button onclick="isHaveProductInCategoryFor()">Product in Category (For)</button>
+            <button onclick="filterProductBySaleDateDetailsES6()">Filter by Sale Date & Quality (ES6)</button>
+            <button onclick="filterProductBySaleDateDetailsFor()">Filter by Sale Date & Quality (For)</button>
+        </div>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        class Product {
+            constructor(id, name, categoryId, saleDate, quantity, isDelete) {
+                this.id = id;
+                this.name = name;
+                this.categoryId = categoryId;
+                this.saleDate = new Date(saleDate);
+                this.quantity = quantity;
+                this.isDelete = isDelete;
+            }
+        }
+
+        const listProduct = [
+            new Product(1, 'banh', 1, '2025-07-25', 10, false),
+            new Product(2, 'keo', 2, '2023-06-15', 0, true),
+            new Product(3, 'ca', 3, '2024-05-10', 5, false),
+            new Product(4, 'tom ', 1, '2025-08-20', 15, false),
+            new Product(5, 'thit ', 2, '2022-04-05', 0, true),
+            new Product(6, 'coca ', 3, '2025-12-12', 8, false),
+            new Product(7, 'rau', 1, '2023-03-22', 0, false),
+            new Product(8, 'chanh', 2, '2024-11-11', 6, false),
+            new Product(9, 'quat ', 3, '2025-01-01', 20, false),
+            new Product(10, 'pho', 1, '2025-09-30', 12, false)
+        ];
+
+        function displayResult(result) {
+            document.getElementById('result').innerText = JSON.stringify(result, null, 2);
+        }
+
+        function PrintfAll() {
+            displayResult(listProduct);
+        }
+
+
+        function filterProductByIdES6() {
+            const id = parseInt(document.getElementById('productId').value);
+            const product = listProduct.find(p => p.id === id);
+            displayResult(product ? product : 'Product not found');
+        }
+
+        function filterProductByIdFor() {
+            const id = parseInt(document.getElementById('productId').value);
+            let product = null;
+            for (let i = 0; i < listProduct.length; i++) {
+                if (listProduct[i].id === id) {
+                    product = listProduct[i];
+                    break;
+                }
+            }
+            displayResult(product ? product.name : 'Product not found');
+        }
+
+        function filterProductByQualityES6() {
+            const products = listProduct.filter(p => p.quantity > 0 && !p.isDelete);
+            displayResult(products);
+        }
+
+        function filterProductByQualityFor() {
+            const products = [];
+            for (let i = 0; i < listProduct.length; i++) {
+                if (listProduct[i].quantity > 0 && !listProduct[i].isDelete) {
+                    products.push(listProduct[i]);
+                }
+            }
+            displayResult(products);
+        }
+
+        function filterProductBySaleDateES6() {
+            const today = new Date();
+            const products = listProduct.filter(p => p.saleDate > today && !p.isDelete);
+            displayResult(products);
+        }
+
+        function filterProductBySaleDateFor() {
+            const today = new Date();
+            const products = [];
+            for (let i = 0; i < listProduct.length; i++) {
+                if (listProduct[i].saleDate > today && !listProduct[i].isDelete) {
+                    products.push(listProduct[i]);
+                }
+            }
+            displayResult(products);
+        }
+
+        function totalProductES6() {
+            const total = listProduct.reduce((sum, p) => sum + (p.isDelete ? 0 : p.quantity), 0);
+            displayResult(total);
+        }
+
+        function totalProductFor() {
+            let total = 0;
+            for (let i = 0; i < listProduct.length; i++) {
+                if (!listProduct[i].isDelete) {
+                    total += listProduct[i].quantity;
+                }
+            }
+            displayResult(total);
+        }
+
+        function isHaveProductInCategoryES6() {
+            const categoryId = parseInt(document.getElementById('categoryId').value);
+            const hasProduct = listProduct.some(p => p.categoryId === categoryId && !p.isDelete);
+            displayResult(hasProduct);
+        }
+
+        function isHaveProductInCategoryFor() {
+            const categoryId = parseInt(document.getElementById('categoryId').value);
+            let hasProduct = false;
+            for (let i = 0; i < listProduct.length; i++) {
+                if (listProduct[i].categoryId === categoryId && !listProduct[i].isDelete) {
+                    hasProduct = true;
+                    break;
+                }
+            }
+            displayResult(hasProduct);
+        }
+
+        function filterProductBySaleDateDetailsES6() {
+            const today = new Date();
+            const products = listProduct
+                .filter(p => p.saleDate > today && p.quantity > 0 && !p.isDelete)
+                .map(p => ({ id: p.id, name: p.name }));
+            displayResult(products);
+        }
+
+        function filterProductBySaleDateDetailsFor() {
+            const today = new Date();
+            const products = [];
+            for (let i = 0; i < listProduct.length; i++) {
+                if (listProduct[i].saleDate > today && listProduct[i].quantity > 0 && !listProduct[i].isDelete) {
+                    products.push({ id: listProduct[i].id, name: listProduct[i].name });
+                }
+            }
+            displayResult(products);
+        }
+    </script>
+</body>
+</html>
